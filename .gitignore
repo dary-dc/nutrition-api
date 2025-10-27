@@ -1,0 +1,28 @@
+# Bytecode and cache
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.env
+venv/
+.env/
+
+# Editor and OS junk
+.vscode/
+.idea/
+.DS_Store
+
+# Logs and temp
+*.log
+*.tmp
+
+# Local database or config
+*.sqlite3
+
+# Dependency cache
+*.egg-info/
+build/
+dist/
+
+# my notes for learning along the way :]
+dev_notes/
