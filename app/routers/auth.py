@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app import models, schemas
@@ -8,6 +8,7 @@ from app.exceptions import (
     UserAlreadyExistsException,
     InvalidLoginException,
 )
+from core.limiter import limiter
 
 router = APIRouter()
 
@@ -31,7 +32,7 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 # ---------------- Login ----------------
 @router.post("/login")
-def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
 
     user = db.query(models.User).filter(models.User.username == form_data.username).first()
 

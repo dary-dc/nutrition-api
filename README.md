@@ -44,6 +44,7 @@ pip install -r requirements.txt
 | `uvicorn`         | ASGI server to run the FastAPI app      |
 | `sqlalchemy`      | ORM for database models                 |
 | `pydantic`        | Data validation and serialization       |
+| `slowapi`         | Rate limiting for security (brute-force, abuse, DoS) |
 
 # TODO: add these libraries
 pip install python-jose[cryptography] passlib[bcrypt] python-multipart
