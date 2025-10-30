@@ -83,8 +83,25 @@ Then open your browser at:
 | `python-jose[cryptography]` | JWT creation and validation                |
 | `passlib[bcrypt]`           | Password hashing                           |
 | `python-multipart`          | Form and file handling                     |
+| `pydantic-settings`         | Loading config class form .env             |
 
 ---
+
+## 🔐 Environment Configuration
+
+This project uses **pydantic-settings** (built on top of `python-dotenv`)  
+to manage environment variables safely and consistently.
+
+All sensitive or configurable values (e.g. database URL, secret key, algorithm, etc.)  
+are stored in a local `.env` file, which is **not committed** to version control.
+
+To get started:
+
+```bash
+cp .env.example .env
+```
+
+Then edit .env with your real credentials.
 
 ---
 
@@ -107,18 +124,6 @@ nutrition_api/
 ├── .env.example          # Example environment configuration
 ├── .gitignore
 └── README.md
-```
-
-## 🧩 Environment Variables
-
-Create a `.env` file in the project root:
-
-```env
-DATABASE_URL=sqlite:///./nutrition.db
-SECRET_KEY=supersecret
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=60
-REDIS_URL=redis://localhost:6379
 ```
 
 ---

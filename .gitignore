@@ -5,7 +5,6 @@ __pycache__/
 # Virtual environments
 .env
 venv/
-.env/
 
 # Editor and OS junk
 .vscode/
