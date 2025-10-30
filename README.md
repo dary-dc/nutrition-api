@@ -1,53 +1,88 @@
 ````markdown
 # 🥦 Nutrition API
 
-A small FastAPI project for managing users, foods, and meals — built for learning and experimentation.
+A modular **FastAPI** backend for managing users, foods, and meals 
+— built for learning, experimentation, and good backend practices.
+
+
+---
+
+## ⚙️ Overview
+
+This project explores how to design a clean and extensible API using **FastAPI**, **SQLAlchemy**, **Pydantic**, and **JWT-based authentication**.  
+It includes examples of:
+
+- ✅ User management (registration, authentication)
+- 🍎 CRUD operations for foods and meals
+- 🔒 Security layers (JWT, hashing, rate-limiting)
+- ⚡ Performance features (caching, async DB sessions)
+- 🧩 Hexagonal-inspired modular architecture for scalability (in )
 
 ---
 
 ## 🚀 Setup Instructions
 
-### 1️⃣ Create a virtual environment
+### 1️⃣ Clone the repository
+```bash
+git clone https://github.com/<your-username>/nutrition-api.git
+cd nutrition-api
+```
+
+### 2️⃣ Create a virtual environment
 ```bash
 python -m venv venv
-````
+```
 
-### 2️⃣ Activate it
+### 3️⃣ Activate it
 
 **Windows (PowerShell):**
-
 ```bash
 venv\Scripts\Activate.ps1
 ```
 
 **Linux/macOS:**
-
 ```bash
 source venv/bin/activate
 ```
 
 ### 3️⃣ Install dependencies
 
-You can install everything at once from `requirements.txt` (once you generate it):
-
 ```bash
 pip install -r requirements.txt
 ```
+
+4️⃣ (Optional) Run Redis for caching and rate-limiting
+
+```bash
+docker run -d -p 6379:6379 --name redis-cont redis
+```
+
+## ▶️ Run the API
+
+```bash
+uvicorn app.main:app --reload
+
+```
+
+Then open your browser at:
+👉 [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+
 
 ---
 
 ## 📦 Dependencies Installed
 
-| Library           | Purpose                                 |
-| ----------------- | --------------------------------------- |
-| `fastapi`         | Web framework for building APIs         |
-| `uvicorn`         | ASGI server to run the FastAPI app      |
-| `sqlalchemy`      | ORM for database models                 |
-| `pydantic`        | Data validation and serialization       |
-| `slowapi`         | Rate limiting for security (brute-force, abuse, DoS) |
-
-# TODO: add these libraries
-pip install python-jose[cryptography] passlib[bcrypt] python-multipart
+| Library                     | Purpose                                    |
+| --------------------------- | ------------------------------------------ |
+| `fastapi`                   | Web framework for APIs                     |
+| `uvicorn`                   | ASGI server                                |
+| `sqlalchemy`                | ORM for data models                        |
+| `pydantic`                  | Data validation and serialization          |
+| `slowapi`                   | Rate limiting (anti-abuse, DoS prevention) |
+| `fastapi-cache2`            | Caching layer for performance              |
+| `python-jose[cryptography]` | JWT creation and validation                |
+| `passlib[bcrypt]`           | Password hashing                           |
+| `python-multipart`          | Form and file handling                     |
 
 ---
 
@@ -59,33 +94,76 @@ pip install python-jose[cryptography] passlib[bcrypt] python-multipart
 nutrition_api/
 │
 ├── app/
-│   ├── main.py
-│   ├── models.py
-│   ├── schemas.py
-│   └── database.py
+│   ├── main.py           # FastAPI entrypoint
+│   ├── database.py       # SQLAlchemy engine and session
+│   ├── models.py         # ORM models
+│   ├── schemas.py        # Pydantic DTOs
+│   ├── routers/          # Route definitions (users, foods, meals, etc.)
+│   ├── services/         # Business logic and reusable modules
+│   ├── core/             # Auth, config, and utilities
+│   └── tests/            # Pytest unit/integration tests
 │
-├── venv/
 ├── requirements.txt
+├── .env.example          # Example environment configuration
+├── .gitignore
 └── README.md
 ```
 
----
+## 🧩 Environment Variables
 
-## ▶️ Run the API
+Create a `.env` file in the project root:
 
-```bash
-uvicorn app.main:app --reload
+```env
+DATABASE_URL=sqlite:///./nutrition.db
+SECRET_KEY=supersecret
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=60
+REDIS_URL=redis://localhost:6379
 ```
 
-Then open your browser at:
-👉 [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+---
+
+## 🧪 Development Notes
+
+* Use `pip freeze > requirements.txt` to update dependencies.
+* Keep `venv/` out of version control.
+* For testing:
+
+  ```bash
+  pytest -v
+  ```
+* To format your code:
+
+  ```bash
+  black .
+  ```
 
 ---
 
-## 📝 Notes
+## 🧭 Roadmap
 
-* Keep `venv/` out of version control (`.gitignore` it).
-* Always activate the venv before running or installing anything.
-* Keep your `requirements.txt` updated with `pip freeze > requirements.txt`.
+* [ ] Add JWT authentication routes (`/auth/login`, `/auth/register`)
+* [ ] Implement rate-limiting on login endpoint
+* [ ] Add `fastapi-cache2` for static food data
+* [ ] Dockerize the app with separate dev/prod configurations
+* [ ] Add Alembic migrations
+* [ ] Create CI pipeline for linting & testing
+* [ ] Refactor to Hexagonal
+* [ ] Deploy V0
+
+---
+
+## 💡 Inspiration
+
+This project is part of my backend learning journey, combining modern FastAPI practices with clean architecture principles.
+Think of it as a *playground for backend craftsmanship* 🧠
+
+---
+
+## 🧑‍💻 Author
+
+**Darian Delgado Crespo**
+Backend Developer • Python & Symfony
+🌐 [LinkedIn](https://www.linkedin.com/in/darian-delgado-crespo-153b7937a/)
 
 ---

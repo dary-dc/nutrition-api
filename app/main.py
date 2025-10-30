@@ -11,7 +11,7 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(title="Nutrition API", version="0.1.0")
 
 # TODO: move to .env
-API_PREFIX = "/api/v1"
+API_PREFIX = "/api/v0"
 api_router = APIRouter(prefix=API_PREFIX)
 
 # Routers
