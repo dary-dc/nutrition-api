@@ -8,6 +8,8 @@ class Settings(BaseSettings):
 
     # Database
     DATABASE_URL: str
+    DEV_DATABASE_URL: str
+    TEST_DATABASE_URL: str | None = None
 
     # Environment
     ENVIRONMENT: str = "local"

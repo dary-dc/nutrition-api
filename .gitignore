@@ -16,6 +16,8 @@ venv/
 *.tmp
 
 # Local database or config
+nutrition.db
+*.sqlite
 *.sqlite3
 
 # Dependency cache

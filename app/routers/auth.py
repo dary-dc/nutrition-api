@@ -8,7 +8,7 @@ from app.exceptions import (
     UserAlreadyExistsException,
     InvalidLoginException,
 )
-from core.limiter import limiter
+from app.core.limiter import limiter
 
 router = APIRouter()
 

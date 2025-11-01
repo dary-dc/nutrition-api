@@ -1,7 +1,7 @@
 from fastapi import FastAPI, APIRouter
 from app.database import Base, engine
 from app.routers import foods, meals, auth, home
-from app.core.limiter import limiter, rate_limit_handler
+from app.core.limiter import register_rate_limiter
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.errors import RateLimitExceeded
 
@@ -22,7 +22,5 @@ api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(api_router)
 app.include_router(home.router, tags=["home"])
 
-# SlowAPI middleware for ratelimiting
-app.state.limiter = limiter
-app.add_middleware(SlowAPIMiddleware)
-app.add_exception_handler(RateLimitExceeded, rate_limit_handler)
+# SlowAPI middleware for ratelimiting and exception handler
+register_rate_limiter(app)
