@@ -8,13 +8,14 @@ from app.core import auth
 
 router = APIRouter()
 
+
 # ---------- GET all foods (with pagination) ----------
 @router.get("/", response_model=List[schemas.FoodResponse])
 def get_foods(
     page: int = Query(None, ge=1),
     skip: int = Query(None, ge=0),
     limit: int = Query(10, le=100),  # limit capped at 100 for safety
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     # Prioritize page if both provided
     if page is not None:
@@ -40,7 +41,11 @@ def get_food(food_id: int, db: Session = Depends(get_db)):
 
 # ---------- CREATE new food ----------
 @router.post("/", response_model=schemas.FoodResponse)
-def create_food(food: schemas.FoodCreate, db: Session = Depends(get_db), user: models.User = Depends(auth.get_current_user)):
+def create_food(
+    food: schemas.FoodCreate,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(auth.get_current_user),
+):
 
     if not user.is_admin or not user.is_specialist:
         raise AccessException()
@@ -56,8 +61,12 @@ def create_food(food: schemas.FoodCreate, db: Session = Depends(get_db), user: m
 
 # ---------- UPDATE food ----------
 @router.put("/{food_id}", response_model=schemas.FoodResponse)
-def update_food(food_id: int, updated_food: schemas.FoodCreate, db: Session = Depends(get_db), user: models.User = Depends(auth.get_current_user)):
-
+def update_food(
+    food_id: int,
+    updated_food: schemas.FoodUpdate,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(auth.get_current_user),
+):
     if not user.is_admin or not user.is_specialist:
         raise AccessException()
 
@@ -74,10 +83,37 @@ def update_food(food_id: int, updated_food: schemas.FoodCreate, db: Session = De
 
     return db_food
 
+# ---------- PARTIAL UPDATE food ----------
+@router.patch("/{food_id}", response_model=schemas.FoodResponse)
+def partial_update_food(
+    food_id: int,
+    partial_food: schemas.FoodPartialUpdate,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(auth.get_current_user),
+):
+    if not user.is_admin or not user.is_specialist:
+        raise AccessException()
+
+    db_food = db.query(models.Food).filter(models.Food.id == food_id).first()
+    if not db_food:
+        raise NotFoundException()
+
+    # Only update provided fields (exclude_unset=True)
+    for key, value in partial_food.model_dump(exclude_unset=True).items():
+        setattr(db_food, key, value)
+
+    db.commit()
+    db.refresh(db_food)
+    return db_food
+
 
 # ---------- DELETE food ----------
 @router.delete("/{food_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_food(food_id: int, db: Session = Depends(get_db), user: models.User = Depends(auth.get_current_user)):
+def delete_food(
+    food_id: int,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(auth.get_current_user),
+):
 
     if not user.is_admin:
         raise AccessException()
