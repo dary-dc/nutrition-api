@@ -2,8 +2,6 @@ from fastapi import FastAPI, APIRouter
 from app.database import Base, engine
 from app.routers import foods, meals, auth, home
 from app.core.limiter import register_rate_limiter
-from slowapi.middleware import SlowAPIMiddleware
-from slowapi.errors import RateLimitExceeded
 
 # Create DB tables
 Base.metadata.create_all(bind=engine)
