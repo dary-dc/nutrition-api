@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.orm import Session
 from typing import List
 from app import models, schemas
-from app.core.const.base_roles import BASE_ROLES
-from app.core.security import require_role
+from app.core.const.permissions import PERMISSIONS
+from app.core.security import require_permission
 from app.database import get_db
 from app.exceptions import NotFoundException
 
@@ -44,7 +44,7 @@ def get_food(food_id: int, db: Session = Depends(get_db)):
 def create_food(
     food: schemas.FoodCreate,
     db: Session = Depends(get_db),
-    user: models.User = Depends(require_role(BASE_ROLES.SPECIALIST)),
+    user: models.User = Depends(require_permission(PERMISSIONS.FOOD_CREATE)),
 ):
     db_food = models.Food(**food.model_dump())
 
@@ -61,7 +61,7 @@ def update_food(
     food_id: int,
     updated_food: schemas.FoodUpdate,
     db: Session = Depends(get_db),
-    user: models.User = Depends(require_role(BASE_ROLES.SPECIALIST)),
+    user: models.User = Depends(require_permission(PERMISSIONS.FOOD_UPDATE)),
 ):
     db_food = (
         db.query(models.Food)
@@ -88,7 +88,7 @@ def partial_update_food(
     food_id: int,
     partial_food: schemas.FoodPartialUpdate,
     db: Session = Depends(get_db),
-    user: models.User = Depends(require_role(BASE_ROLES.SPECIALIST)),
+    user: models.User = Depends(require_permission(PERMISSIONS.FOOD_UPDATE)),
 ):
     db_food = db.query(models.Food).filter(models.Food.id == food_id).first()
     if not db_food:
@@ -108,7 +108,7 @@ def partial_update_food(
 def delete_food(
     food_id: int,
     db: Session = Depends(get_db),
-    user: models.User = Depends(require_role(BASE_ROLES.SPECIALIST)),
+    user: models.User = Depends(require_permission(PERMISSIONS.FOOD_DELETE)),
 ):
     food = db.query(models.Food).filter(models.Food.id == food_id).first()
 

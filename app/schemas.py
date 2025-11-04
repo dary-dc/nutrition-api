@@ -65,7 +65,6 @@ class FoodPartialUpdate(BaseModel):
     carbohydrates: Optional[float]
 
 
-# TODO: check functioning and purpose of this
 class FoodResponse(FoodBase):
     id: int
 
@@ -74,7 +73,6 @@ class FoodResponse(FoodBase):
 
 
 # ---------- MEAL ----------
-# ---------- Base (shared) ----------
 class MealBase(BaseModel):
     id: int
     user_id: int
@@ -84,7 +82,6 @@ class MealBase(BaseModel):
     )
 
 
-# ---------- CREATE ----------
 class MealCreate(MealBase):
     # Must contain at least one food ID
     food_ids: List[int] = Field(
@@ -92,19 +89,18 @@ class MealCreate(MealBase):
     )
 
 
-# ---------- UPDATE ----------
 class MealUpdate(BaseModel):
-    pass
+    food_ids: List[int] = Field(
+        ..., min_items=1, description="IDs of foods in this meal"
+    )
 
 
-# ---------- PARTIAL UPDATE (PATCH) ----------
 class MealPartialUpdate(BaseModel):
     name: Optional[str] = None
     timestamp: Optional[datetime] = None
     food_ids: Optional[List[int]] = None
 
 
-# ---------- RESPONSE ----------
 class MealResponse(BaseModel):
     id: int
     name: str

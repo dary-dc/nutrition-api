@@ -154,8 +154,8 @@ nutrition_api/
 * [X] RESTful foods schemas
 * [X] RESTful meals CRUD
 * [ ] RESTful meals schemas
-* [ ] RESTful users CRUD
-* [ ] RESTful users schemas
+* [X] RESTful users CRUD
+* [X] RESTful users schemas
 * [ ] RESTful roles CRUD
 * [ ] RESTful roles schemas
 * [ ] RESTful permissions CRUD

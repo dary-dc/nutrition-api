@@ -18,6 +18,10 @@ engine = create_engine(get_database_url(), connect_args={"check_same_thread": Fa
 # Enable foreign keys for SQLite
 @event.listens_for(engine, "connect")
 def enable_foreign_keys(dbapi_connection, connection_record):
+
+    if settings.ENVIRONMENT not in ["local"]:
+        return
+
     cursor = dbapi_connection.cursor()
     cursor.execute("PRAGMA foreign_keys=ON")
     cursor.close()

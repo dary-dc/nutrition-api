@@ -7,7 +7,7 @@ from app.core.const.base_roles import BASE_ROLES
 from app.database import get_db
 from app.exceptions import NotFoundException, UserAlreadyExistsException
 
-router = APIRouter(prefix="/users", tags=["Users"])
+router = APIRouter()
 
 
 # ---------- GET all users (with pagination) ----------
