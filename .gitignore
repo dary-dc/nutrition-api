@@ -5,7 +5,6 @@ __pycache__/
 # Virtual environments
 .env
 venv/
-.env/
 
 # Editor and OS junk
 .vscode/
@@ -17,6 +16,8 @@ venv/
 *.tmp
 
 # Local database or config
+nutrition.db
+*.sqlite
 *.sqlite3
 
 # Dependency cache
