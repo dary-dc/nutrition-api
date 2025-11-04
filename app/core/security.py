@@ -1,7 +1,12 @@
 from datetime import datetime, timedelta, timezone
+from http.client import HTTPException
+from fastapi import Depends
 from jose import jwt
 from passlib.context import CryptContext
+from app.core import auth
 from app.core.config import settings
+from app.exceptions import AccessException
+from app.models import User
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -21,3 +26,21 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     )
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+
+
+def require_permission(permission_name: str):
+    def wrapper(user: User = Depends(auth.get_current_user)):
+        if not user.has_permission(permission_name):
+            raise AccessException(detail=f"User has no access to this resource")
+        return user
+
+    return wrapper
+
+
+def require_role(role_name: str):
+    def wrapper(user: User = Depends(auth.get_current_user)):
+        if not user.has_role(role_name):
+            raise AccessException(detail=f"User has no access to this resource")
+        return user
+
+    return wrapper

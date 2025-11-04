@@ -4,7 +4,7 @@ from typing import List
 from app import models, schemas
 from app.database import get_db
 from app.core import auth
-from app.exceptions import NotFoundException
+from app.exceptions import AccessException, NotFoundException
 
 router = APIRouter()
 
@@ -14,7 +14,6 @@ router = APIRouter()
 def get_meals(
     db: Session = Depends(get_db), user: models.User = Depends(auth.get_current_user)
 ):
-
     meals = db.query(models.Meal).filter(models.Meal.user_id == user.id).all()
 
     return meals
@@ -23,9 +22,11 @@ def get_meals(
 # ---------- GET single meal ----------
 @router.get("/{meal_id}", response_model=schemas.MealResponse)
 def get_meal(meal_id: int, db: Session = Depends(get_db)):
+
     meal = db.query(models.Meal).filter(models.Meal.id == meal_id).first()
     if not meal:
-        raise HTTPException(status_code=404, detail="Meal not found")
+        raise NotFoundException()
+
     return meal
 
 
@@ -53,12 +54,58 @@ def create_meal(
     return new_meal
 
 
+# ---------- UPDATE food ----------
+@router.put("/{meal_id}", response_model=schemas.MealResponse)
+def update_meal(
+    meal_id: int,
+    updated_meal: schemas.MealUpdate,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(auth.get_current_user),
+):
+    db_meal = db.query(models.Meal).filter(models.Meal.id == meal_id).first()
+
+    if not db_meal:
+        raise NotFoundException()
+
+    for key, value in updated_meal.model_dump().items():
+        setattr(db_meal, key, value)
+
+    db.commit()
+    db.refresh(db_meal)
+
+    return db_meal
+
+
+# ---------- PARTIAL UPDATE meal ----------
+@router.patch("/{meal_id}", response_model=schemas.MealResponse)
+def partial_update_meal(
+    meal_id: int,
+    partial_meal: schemas.MealPartialUpdate,
+    db: Session = Depends(get_db),
+    user: models.User = Depends(auth.get_current_user),
+):
+    db_meal = db.query(models.Meal).filter(models.Meal.id == meal_id).first()
+
+    if not db_meal:
+        raise NotFoundException()
+
+    # Only update provided fields (exclude_unset=True)
+    for key, value in partial_meal.model_dump(exclude_unset=True).items():
+        setattr(db_meal, key, value)
+
+    db.commit()
+    db.refresh(db_meal)
+    return db_meal
+
+
 # ---------- DELETE meal ----------
 @router.delete("/{meal_id}")
 def delete_meal(meal_id: int, db: Session = Depends(get_db)):
+
     meal = db.query(models.Meal).filter(models.Meal.id == meal_id).first()
     if not meal:
-        raise HTTPException(status_code=404, detail="Meal not found")
+        raise NotFoundException()
+
     db.delete(meal)
     db.commit()
     return {"detail": "Meal deleted successfully"}

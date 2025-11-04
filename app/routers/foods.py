@@ -2,9 +2,10 @@ from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.orm import Session
 from typing import List
 from app import models, schemas
+from app.core.const.base_roles import BASE_ROLES
+from app.core.security import require_role
 from app.database import get_db
-from app.exceptions import AccessException, NotFoundException
-from app.core import auth
+from app.exceptions import NotFoundException
 
 router = APIRouter()
 
@@ -32,7 +33,6 @@ def get_foods(
 def get_food(food_id: int, db: Session = Depends(get_db)):
 
     food = db.query(models.Food).filter(models.Food.id == food_id).first()
-
     if not food:
         raise NotFoundException()
 
@@ -44,12 +44,8 @@ def get_food(food_id: int, db: Session = Depends(get_db)):
 def create_food(
     food: schemas.FoodCreate,
     db: Session = Depends(get_db),
-    user: models.User = Depends(auth.get_current_user),
+    user: models.User = Depends(require_role(BASE_ROLES.SPECIALIST)),
 ):
-
-    if not user.is_admin or not user.is_specialist:
-        raise AccessException()
-
     db_food = models.Food(**food.model_dump())
 
     db.add(db_food)
@@ -65,11 +61,8 @@ def update_food(
     food_id: int,
     updated_food: schemas.FoodUpdate,
     db: Session = Depends(get_db),
-    user: models.User = Depends(auth.get_current_user),
+    user: models.User = Depends(require_role(BASE_ROLES.SPECIALIST)),
 ):
-    if not user.is_admin or not user.is_specialist:
-        raise AccessException()
-
     db_food = db.query(models.Food).filter(models.Food.id == food_id).first()
 
     if not db_food:
@@ -83,17 +76,15 @@ def update_food(
 
     return db_food
 
+
 # ---------- PARTIAL UPDATE food ----------
 @router.patch("/{food_id}", response_model=schemas.FoodResponse)
 def partial_update_food(
     food_id: int,
     partial_food: schemas.FoodPartialUpdate,
     db: Session = Depends(get_db),
-    user: models.User = Depends(auth.get_current_user),
+    user: models.User = Depends(require_role(BASE_ROLES.SPECIALIST)),
 ):
-    if not user.is_admin or not user.is_specialist:
-        raise AccessException()
-
     db_food = db.query(models.Food).filter(models.Food.id == food_id).first()
     if not db_food:
         raise NotFoundException()
@@ -112,12 +103,8 @@ def partial_update_food(
 def delete_food(
     food_id: int,
     db: Session = Depends(get_db),
-    user: models.User = Depends(auth.get_current_user),
+    user: models.User = Depends(require_role(BASE_ROLES.SPECIALIST)),
 ):
-
-    if not user.is_admin:
-        raise AccessException()
-
     food = db.query(models.Food).filter(models.Food.id == food_id).first()
 
     if not food:
@@ -126,4 +113,4 @@ def delete_food(
     db.delete(food)
     db.commit()
 
-    return None
+    return

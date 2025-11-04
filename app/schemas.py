@@ -6,7 +6,7 @@
 
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
-import datetime
+from datetime import datetime
 
 
 # ---------- USER ----------
@@ -34,11 +34,14 @@ class FoodBase(BaseModel):
     carbs: float
     fat: float
 
+
 class FoodCreate(FoodBase):
     pass
 
+
 class FoodUpdate(FoodBase):
     pass
+
 
 class FoodPartialUpdate(BaseModel):
     name: Optional[str]
@@ -46,6 +49,7 @@ class FoodPartialUpdate(BaseModel):
     protein: Optional[float]
     fat: Optional[float]
     carbohydrates: Optional[float]
+
 
 # TODO: check functioning and purpose of this
 class FoodResponse(FoodBase):
@@ -58,6 +62,8 @@ class FoodResponse(FoodBase):
 # ---------- MEAL ----------
 # ---------- Base (shared) ----------
 class MealBase(BaseModel):
+    id: int
+    user_id: int
     name: str = Field(..., min_length=1, max_length=100)
     timestamp: Optional[datetime] = Field(
         None, description="Datetime of the meal (defaults to now on server)"
@@ -67,14 +73,21 @@ class MealBase(BaseModel):
 # ---------- CREATE ----------
 class MealCreate(MealBase):
     # Must contain at least one food ID
-    food_ids: List[int] = Field(..., min_items=1, description="IDs of foods in this meal")
+    food_ids: List[int] = Field(
+        ..., min_items=1, description="IDs of foods in this meal"
+    )
 
 
-# ---------- UPDATE (PATCH-style) ----------
+# ---------- UPDATE ----------
 class MealUpdate(BaseModel):
+    pass
+
+
+# ---------- PARTIAL UPDATE (PATCH) ----------
+class MealPartialUpdate(BaseModel):
     name: Optional[str] = None
     timestamp: Optional[datetime] = None
-    food_ids: Optional[List[int]] = None  # Can be provided partially or not at all
+    food_ids: Optional[List[int]] = None
 
 
 # ---------- RESPONSE ----------

@@ -147,8 +147,21 @@ nutrition_api/
 
 ## 🧭 Roadmap
 
-* [ ] Add JWT authentication routes (`/auth/login`, `/auth/register`)
-* [ ] Implement rate-limiting on login endpoint
+* [X] Add JWT authentication routes (`/auth/login`, `/auth/register`)
+* [X] .env config with pydantic
+* [X] SQLite DB for local development
+* [X] RESTful foods CRUD
+* [X] RESTful foods schemas
+* [X] RESTful meals CRUD
+* [ ] RESTful meals schemas
+* [ ] RESTful users CRUD
+* [ ] RESTful users schemas
+* [ ] RESTful roles CRUD
+* [ ] RESTful roles schemas
+* [ ] RESTful permissions CRUD
+* [ ] RESTful permissions schemas
+* [X] Implement rate-limiting
+* [X] Role based access control (RBAC).
 * [ ] Add `fastapi-cache2` for static food data
 * [ ] Dockerize the app with separate dev/prod configurations
 * [ ] Add Alembic migrations
