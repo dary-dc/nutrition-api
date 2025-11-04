@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from typing import List
 from app import models, schemas
 from app.database import get_db
 from app.core import auth
-from app.exceptions import AccessException, NotFoundException
+from app.exceptions import NotFoundException
 
 router = APIRouter()
 
@@ -12,9 +12,25 @@ router = APIRouter()
 # ---------- GET all meals ----------
 @router.get("/", response_model=List[schemas.MealResponse])
 def get_meals(
-    db: Session = Depends(get_db), user: models.User = Depends(auth.get_current_user)
+    page: int = Query(None, ge=1),
+    skip: int = Query(None, ge=0),
+    limit: int = Query(10, le=100),  # limit capped at 100 for safety
+    db: Session = Depends(get_db),
+    user: models.User = Depends(auth.get_current_user),
 ):
-    meals = db.query(models.Meal).filter(models.Meal.user_id == user.id).all()
+    # Prioritize page if both provided
+    if page is not None:
+        skip = (page - 1) * limit
+    elif skip is None:
+        skip = 0
+
+    meals = (
+        db.query(models.Meal)
+        .offset(skip)
+        .limit(limit)
+        .filter(models.Meal.user_id == user.id)
+        .all()
+    )
 
     return meals
 

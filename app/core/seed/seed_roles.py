@@ -1,17 +1,9 @@
 from app.core.const.base_roles import BASE_ROLES
-from app.core.const.permissions import PERMISSIONS
 from app.models import Role, Permission
 from sqlalchemy.orm import Session
 
 
-def seed_roles_and_permissions(db: Session):
-
-    # Ensure all permissions exist
-    existing = {p.name for p in db.query(Permission).all()}
-    for perm_name in PERMISSIONS.ALL:
-        if perm_name not in existing:
-            db.add(Permission(name=perm_name))
-    db.flush()  # ensures new permissions are available before roles
+def seed_roles(db: Session):
 
     # Create base roles and assign permissions
     admin = db.query(Role).filter_by(name=BASE_ROLES.ADMIN).first()
