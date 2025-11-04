@@ -26,6 +26,7 @@ def get_meals(
 
     meals = (
         db.query(models.Meal)
+        .order_by(models.Meal.id.asc())
         .offset(skip)
         .limit(limit)
         .filter(models.Meal.user_id == user.id)

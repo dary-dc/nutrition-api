@@ -26,8 +26,17 @@ def register(
         raise UserAlreadyExistsException()
 
     hashed_pw = security.get_password_hash(new_user.password)
+
+    default_role = db.query(models.Role).filter_by(name=BASE_ROLES.USER).first()
+    if not default_role:
+        # If not seeded yet, raise a controlled error
+        raise Exception("Default USER role not found. Run role seeding first.")
+
     db_user = models.User(
-        username=new_user.username, email=new_user.email, password_hash=hashed_pw
+        username=new_user.username,
+        email=new_user.email,
+        hashed_password=hashed_pw,
+        roles=[default_role],
     )
 
     db.add(db_user)
@@ -57,6 +66,7 @@ async def login(
     return {"access_token": access_token, "token_type": "bearer"}
 
 
+# ---------------- Current user ----------------
 # Depends(get_current_user) does more than just injecting a value — it triggers
 # FastAPI’s full dependency resolution chain (including nested deps like Session),
 # along with yield cleanup, async handling, and overrides.

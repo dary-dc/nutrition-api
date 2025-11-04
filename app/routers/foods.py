@@ -63,7 +63,12 @@ def update_food(
     db: Session = Depends(get_db),
     user: models.User = Depends(require_role(BASE_ROLES.SPECIALIST)),
 ):
-    db_food = db.query(models.Food).filter(models.Food.id == food_id).first()
+    db_food = (
+        db.query(models.Food)
+        .order_by(models.Food.id.asc())
+        .filter(models.Food.id == food_id)
+        .first()
+    )
 
     if not db_food:
         raise NotFoundException()

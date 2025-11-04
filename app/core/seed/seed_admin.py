@@ -23,7 +23,7 @@ def seed_admin(db: Session):
         admin_user = User(
             username="admin",
             email="admin@system.local",
-            password_hash=security.get_password_hash("ChangeMe123!"),
+            hashed_password=security.get_password_hash("ChangeMe123!"),
             roles=[admin_role],
         )
         db.add(admin_user)

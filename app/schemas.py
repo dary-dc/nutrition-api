@@ -17,10 +17,24 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
+    role_ids: Optional[List[int]] = None  # allow admin to assign roles
+
+
+class UserUpdate(UserBase):
+    password: Optional[str] = None
+    role_ids: Optional[List[int]] = None  # allow admin to change roles
+
+
+class UserPartialUpdate(BaseModel):
+    username: Optional[str]
+    email: Optional[str]
+    password: Optional[str]
+    role_ids: Optional[List[int]] = None  # allow admin to change roles
 
 
 class UserResponse(UserBase):
     id: int
+    roles: List[str]
 
     class Config:
         from_attributes = True
