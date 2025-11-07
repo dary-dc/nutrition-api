@@ -16,7 +16,8 @@ class Settings(BaseSettings):
     DEBUG: bool = True
 
     # Cache
-    REDIS_URL: str
+    CACHE_BACKEND: str
+    CACHE_URL: str
 
     model_config = SettingsConfigDict(
         env_file=".env",

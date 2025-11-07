@@ -72,18 +72,21 @@ Then open your browser at:
 
 ## 📦 Dependencies Installed
 
-| Library                     | Purpose                                    |
-| --------------------------- | ------------------------------------------ |
-| `fastapi`                   | Web framework for APIs                     |
-| `uvicorn`                   | ASGI server                                |
-| `sqlalchemy`                | ORM for data models                        |
-| `pydantic`                  | Data validation and serialization          |
-| `slowapi`                   | Rate limiting (anti-abuse, DoS prevention) |
-| `fastapi-cache2`            | Caching layer for performance              |
-| `python-jose[cryptography]` | JWT creation and validation                |
-| `passlib[bcrypt]`           | Password hashing                           |
-| `python-multipart`          | Form and file handling                     |
-| `pydantic-settings`         | Loading config class form .env             |
+| Library                     | Purpose                                                |
+| --------------------------- | -------------------------------------------------------|
+| `fastapi`                   | Web framework for APIs                                 |
+| `uvicorn`                   | ASGI server                                            |
+| `sqlalchemy`                | ORM for data models                                    |
+| `pydantic`                  | Data validation and serialization                      |
+| `slowapi`                   | Rate limiting (anti-abuse, DoS prevention)             |
+| `fastapi-cache2`            | Caching layer for performance                          |
+| `python-jose[cryptography]` | JWT creation and validation                            |
+| `passlib[bcrypt]`           | Password hashing                                       |
+| `python-multipart`          | Form and file handling                                 |
+| `pydantic-settings`         | Loading config class form .env                         |
+| `redis`                     | Key-based in memory cache layer (high performance      |
+|                             | persistence, several DS, expiration, logs, async,      |
+|                             | support, etc. )                                        |
 
 ---
 
@@ -153,7 +156,7 @@ nutrition_api/
 * [X] RESTful foods CRUD
 * [X] RESTful foods schemas
 * [X] RESTful meals CRUD
-* [ ] RESTful meals schemas
+* [X] RESTful meals schemas
 * [X] RESTful users CRUD
 * [X] RESTful users schemas
 * [ ] RESTful roles CRUD

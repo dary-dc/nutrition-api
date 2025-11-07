@@ -1,5 +1,6 @@
 from fastapi import FastAPI, APIRouter
 from fastapi.concurrency import asynccontextmanager
+from app.core.cache import init_cache
 from app.core.seed.seed_permissions import seed_permissions
 from app.core.seed.seed_roles import seed_roles
 from app.core.seed.seed_admin import seed_admin
@@ -19,6 +20,8 @@ async def lifespan(app: FastAPI):
         seed_permissions(db)
         seed_roles(db)
         seed_admin(db)
+
+        await init_cache()
         yield
 
     finally:
@@ -30,10 +33,6 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,
 )
-
-# TODO: move to .env?
-API_PREFIX = "/api/v0"
-api_router = APIRouter(prefix=API_PREFIX)
 
 # Include all routers
 app.include_router(api_router)
