@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+
+  app:
+    build: .
+    container_name: nutrition-api
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    environment:
+      - CACHE_URL=redis://redis:6379
+      - CACHE_BACKEND=auto
+    volumes:
+      - .:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis-dev
+    ports:
+      - "6379:6379"
