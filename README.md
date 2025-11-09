@@ -87,6 +87,7 @@ Then open your browser at:
 | `redis`                     | Key-based in memory cache layer (high performance      |
 |                             | persistence, several DS, expiration, logs, async,      |
 |                             | support, etc. )                                        |
+| `psycopg[binary]`           | Compiled psycopg 3, faster than psycopg2, async ready  |
 
 ---
 

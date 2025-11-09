@@ -4,15 +4,19 @@ from sqlalchemy.orm import sessionmaker
 from app.core.config import settings
 
 
-def get_database_url():
+def get_database_url() -> str:
     if settings.ENVIRONMENT in ["local"]:
         return settings.DEV_DATABASE_URL
     return settings.DATABASE_URL
 
+def get_connect_args() -> dict:
+    if settings.ENVIRONMENT in ["local"]:
+        return {"check_same_thread": False}
+    return {}
 
 Base = declarative_base()
 
-engine = create_engine(get_database_url(), connect_args={"check_same_thread": False})
+engine = create_engine(get_database_url(), connect_args=get_connect_args())
 
 
 # Enable foreign keys for SQLite
