@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta, timezone
-from http.client import HTTPException
 from fastapi import Depends
 from jose import jwt
 from passlib.context import CryptContext
@@ -8,7 +7,8 @@ from app.core.config import settings
 from app.exceptions import AccessException
 from app.models import User
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Argon2 is modern, memory-hard, and recommended by OWASP for new systems.
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 
 def verify_password(plain_password, hashed_password):

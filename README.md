@@ -81,7 +81,7 @@ Then open your browser at:
 | `slowapi`                   | Rate limiting (anti-abuse, DoS prevention)             |
 | `fastapi-cache2`            | Caching layer for performance                          |
 | `python-jose[cryptography]` | JWT creation and validation                            |
-| `passlib[bcrypt]`           | Password hashing                                       |
+| `passlib[argon2]`           | Recommended, modern and memory hard password hashing   |
 | `python-multipart`          | Form and file handling                                 |
 | `pydantic-settings`         | Loading config class form .env                         |
 | `redis`                     | Key-based in memory cache layer (high performance      |

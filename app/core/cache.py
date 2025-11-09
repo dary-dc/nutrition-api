@@ -3,7 +3,7 @@ from fastapi_cache.backends.redis import RedisBackend
 from redis import asyncio as aioredis
 from fastapi_cache.backends.inmemory import InMemoryBackend
 
-from app.core.config import Settings
+from app.core.config import settings
 
 
 async def init_cache() -> None:
@@ -12,8 +12,8 @@ async def init_cache() -> None:
     depending on configuration and environment.
     """
 
-    backend = (Settings.CACHE_BACKEND or "auto").lower()
-    env = (Settings.ENVIRONMENT or "local").lower()
+    backend = (settings.CACHE_BACKEND or "auto").lower()
+    env = (settings.ENVIRONMENT or "local").lower()
 
     use_redis = backend == "redis" or (
         backend == "auto" and env not in ["local", "test"]
@@ -22,12 +22,12 @@ async def init_cache() -> None:
     if use_redis:
         try:
             redis = aioredis.from_url(
-                Settings.CACHE_URL,
+                settings.CACHE_URL,
                 encoding="utf-8",
                 decode_responses=True,
             )
             FastAPICache.init(RedisBackend(redis), prefix="api")
-            print(f"✅ Cache initialized with Redis backend at {Settings.CACHE_URL}")
+            print(f"✅ Cache initialized with Redis backend at {settings.CACHE_URL}")
         except Exception as e:
             # Graceful fallback to in-memory cache if Redis fails
             FastAPICache.init(InMemoryBackend(), prefix="fallback-api")
