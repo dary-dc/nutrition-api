@@ -58,7 +58,7 @@ async def login(
         db.query(models.User).filter(models.User.username == form_data.username).first()
     )
 
-    if not user or not security.verify_password(form_data.password, user.password_hash):
+    if not user or not security.verify_password(form_data.password, user.hashed_password):
         raise InvalidLoginException()
 
     access_token = security.create_access_token(data={"sub": str(user.id)})

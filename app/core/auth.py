@@ -6,14 +6,14 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app import models
 from app.exceptions import CredentialsException
-from app.core import security
+from app.core.config import settings
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
 # ---------------- Get current user ----------------
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     try:
-        payload = jwt.decode(token, security.SECRET_KEY, algorithms=[security.ALGORITHM])
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         user_id: str = payload.get("sub")
         if user_id is None:
             raise CredentialsException()

@@ -1,3 +1,4 @@
+from app.core.exception import register_exception_handler
 from fastapi import FastAPI, APIRouter
 from fastapi.concurrency import asynccontextmanager
 from app.core.cache import init_cache
@@ -7,6 +8,7 @@ from app.core.seed.seed_admin import seed_admin
 from app.database import Base, SessionLocal, engine
 from app.routers.api import api_router, root_router
 from app.core.limiter import register_rate_limiter
+from app.core.logging_config import configure_logging
 
 # Create DB tables
 Base.metadata.create_all(bind=engine)
@@ -40,3 +42,5 @@ app.include_router(root_router)
 
 # SlowAPI middleware for ratelimiting and exception handler
 register_rate_limiter(app)
+register_exception_handler(app)
+configure_logging()

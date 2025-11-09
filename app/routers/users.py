@@ -70,7 +70,7 @@ def create_user(
         email=user_in.email,
         hashed_password=hashed_pw,
     )
-
+    print(db.query(models.Role).filter(models.Role.id.in_(user_in.role_ids)).all())
     # Assign roles if provided
     if user_in.role_ids:
         roles = db.query(models.Role).filter(models.Role.id.in_(user_in.role_ids)).all()
