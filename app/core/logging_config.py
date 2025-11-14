@@ -15,6 +15,6 @@ def configure_logging():
     logger = logging.getLogger(__name__)
     logger.debug("Logger initialized ✅")
 
-def get_logger(file_name):
+def get_logger(file_name) -> logging:
     logging.getLogger(file_name)
     return logging.getLogger()

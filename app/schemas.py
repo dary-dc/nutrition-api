@@ -8,6 +8,30 @@ from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
 from datetime import datetime
 
+# ---------- PERMISSION ----------
+class PermissionBase(BaseModel):
+    name: str
+    description: str | None
+
+class PermissionCreate(PermissionBase):
+    pass
+
+class PermissionResponse(PermissionBase):
+    id: int
+
+
+# ---------- ROLE ----------
+class RoleBase(BaseModel):
+    name: str
+    description: str | None
+    permissions: List[PermissionResponse]
+
+class RoleCreate(RoleBase):
+    pass
+
+class RoleResponse(RoleBase):
+    id: int
+
 
 # ---------- USER ----------
 class UserBase(BaseModel):
@@ -34,7 +58,7 @@ class UserPartialUpdate(BaseModel):
 
 class UserResponse(UserBase):
     id: int
-    roles: List[str]
+    roles: List[RoleResponse]
 
     class Config:
         from_attributes = True

@@ -9,6 +9,6 @@ def seed_permissions(db: Session):
     existing = {p.name for p in db.query(Permission).all()}
     for perm_name in PERMISSIONS.ALL:
         if perm_name not in existing:
-            db.add(Permission(name=perm_name))
+            db.add(Permission(name=perm_name, description=f"Access to endpoint {perm_name}"))
 
     db.commit()
