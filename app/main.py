@@ -5,12 +5,13 @@ from app.core.cache import init_cache
 from app.core.seed.seed_permissions import seed_permissions
 from app.core.seed.seed_roles import seed_roles
 from app.core.seed.seed_admin import seed_admin
-from app.database import Base, SessionLocal, engine
+from app.database import Base, SessionLocal, engine, remove_database_file
 from app.routers.api import api_router, root_router
 from app.core.limiter import register_rate_limiter
 from app.core.logging_config import configure_logging
 
 # Create DB tables
+remove_database_file()
 Base.metadata.create_all(bind=engine)
 
 

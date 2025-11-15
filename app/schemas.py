@@ -69,7 +69,7 @@ class FoodBase(BaseModel):
     name: str
     calories: float
     protein: float
-    carbs: float
+    carbohydrates: float
     fat: float
 
 

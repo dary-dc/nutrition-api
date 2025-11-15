@@ -7,8 +7,9 @@ from app.database import get_db
 from app import models
 from app.exceptions import CredentialsException
 from app.core.config import settings
+from app.core.context import current_user_id
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v0/auth/login")
 
 # ---------------- Get current user ----------------
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
@@ -23,5 +24,8 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     user = db.query(models.User).filter(models.User.id == int(user_id)).first()
     if user is None:
         raise CredentialsException()
+
+    # update context
+    current_user_id.set(user.id)
 
     return user

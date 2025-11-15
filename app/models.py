@@ -1,10 +1,9 @@
 # The models.py file defines the database structure using SQLAlchemy ORM.
 # Each class represents a table in the database, and each attribute (column) represents a field in that table.
 
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Table
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Table, func
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from app.database import Base  # use the same registry of database.py
-from sqlalchemy.sql import func
 from typing import List
 
 
@@ -65,6 +64,7 @@ class Role(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    description: Mapped[str] = mapped_column(String(255), nullable=True)
 
     # Back reference to users (many-to-many)
     users: Mapped[List["User"]] = relationship(
@@ -90,7 +90,7 @@ class User(Base):
     # --- Object references (linked models) ---
     # One-to-many: User → Meal
     meals: Mapped[List["Meal"]] = relationship(
-        "Meal", back_populates="user", cascade="all, delete-orphan"
+        "Meal", back_populates="user", cascade="all, delete-orphan", foreign_keys=lambda: [Meal.user_id],
     )
 
     # Many-to-many: User ↔ Role
@@ -136,7 +136,7 @@ class Meal(Base):
     )  # generate datetime at the DB level
 
     # --- Object references (linked models) ---
-    user: Mapped["User"] = relationship("User", back_populates="meals")
+    user: Mapped["User"] = relationship("User", back_populates="meals", foreign_keys=[user_id])
     foods: Mapped[List["Food"]] = relationship("Food", secondary=meal_food_association)
 
     def __repr__(self):

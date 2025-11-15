@@ -4,6 +4,22 @@ from sqlalchemy.orm import sessionmaker
 from app.core.config import settings
 
 
+def remove_database_file():
+
+    url = get_database_url()
+    if not url.startswith('sqlite'):
+        return
+    
+    print("Deleting previous database file for development")
+
+    file = url.split('/')[-1]
+
+    import os
+    if os.path.exists(file):
+        os.remove(file)
+    
+
+
 def get_database_url() -> str:
     if settings.ENVIRONMENT in ["local"]:
         return settings.DEV_DATABASE_URL
