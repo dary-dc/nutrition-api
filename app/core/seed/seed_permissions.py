@@ -1,5 +1,5 @@
 from app.core.const.permissions import PERMISSIONS
-from app.models import Permission
+from app.models.permission import Permission
 from sqlalchemy.orm import Session
 
 

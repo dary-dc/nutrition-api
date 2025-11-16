@@ -1,5 +1,6 @@
 from app.core.const.base_roles import BASE_ROLES
-from app.models import Role, Permission
+from app.models.role import Role
+from app.models.permission import Permission
 from sqlalchemy.orm import Session
 
 

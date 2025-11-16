@@ -1,7 +1,8 @@
+from app.models import models
 from fastapi import APIRouter, Depends, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from app import models, schemas
+from app import schemas
 from app.core.const.base_roles import BASE_ROLES
 from app.database import get_db
 from app.core import security, auth

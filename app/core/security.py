@@ -5,7 +5,7 @@ from passlib.context import CryptContext
 from app.core import auth
 from app.core.config import settings
 from app.exceptions import AccessException
-from app.models import User
+from app.models.user import User
 
 # Argon2 is modern, memory-hard, and recommended by OWASP for new systems.
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")

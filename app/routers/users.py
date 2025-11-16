@@ -1,7 +1,8 @@
+from app.models import models
 from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.orm import Session
 from typing import List
-from app import models, schemas
+from app import schemas
 from app.core.security import require_role, get_password_hash
 from app.core.const.base_roles import BASE_ROLES
 from app.database import get_db

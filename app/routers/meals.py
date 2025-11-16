@@ -1,7 +1,8 @@
+from app.models import models
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from typing import List
-from app import models, schemas
+from app import schemas
 from app.database import get_db
 from app.core import auth
 from app.exceptions import NotFoundException
