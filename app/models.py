@@ -30,12 +30,23 @@ user_role_association = Table(
     Column("role_id", Integer, ForeignKey("role.id"), primary_key=True),
 )
 
+
 # one-to-many: Role ↔ Permission
 role_permission_association = Table(
     "role_permission_association",
     Base.metadata,
     Column("role_id", Integer, ForeignKey("role.id"), primary_key=True),
     Column("permission_id", Integer, ForeignKey("permission.id"), primary_key=True),
+)
+
+
+food_nutrient_association = Table(
+    "food_nutrient",
+    Base.metadata,
+    Column("food_id", Integer, ForeignKey("food.id"), primary_key=True),
+    Column("nutrient_id", Integer, ForeignKey("nutrient.id"), primary_key=True),
+    Column("value_per_100g", Float, nullable=False),
+    Column("source_id", Integer, ForeignKey("source.id"))
 )
 
 
@@ -81,16 +92,16 @@ class Role(Base):
 class User(Base):
     __tablename__ = "user"
 
-    # --- Basic columns ---
-    id: int = Column(Integer, primary_key=True, index=True)
-    username: str = Column(String, unique=True, nullable=False)
-    email: str = Column(String, unique=True, nullable=False)
-    hashed_password: str = Column(String, nullable=False)
+    # --- Basic mapped_columns ---
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    username: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    email: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    hashed_password: Mapped[str] = mapped_column(String, nullable=False)
 
     # --- Object references (linked models) ---
     # One-to-many: User → Meal
     meals: Mapped[List["Meal"]] = relationship(
-        "Meal", back_populates="user", cascade="all, delete-orphan", foreign_keys=lambda: [Meal.user_id],
+        "Meal", back_populates="user", cascade="all, delete-orphan", foreign_keys="Meal.user_id",
     )
 
     # Many-to-many: User ↔ Role
@@ -109,29 +120,95 @@ class User(Base):
         return any(permission_name == p.name for r in self.roles for p in r.permissions)
 
 
+class Source(Base):
+    __tablename__ = "source"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    description: Mapped[str] = mapped_column(String(255), nullable=True)
+
+
+# e.g., macronutrients (carbohydrates, proteins, fats, and water) and micronutrients (vitamins and minerals)
+class NutrientCategory(Base):
+    __tablename__ = "nutrient_category"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    description: Mapped[str] = mapped_column(String(255), nullable=True)
+
+    nutrients: Mapped[List["Nutrient"]] = relationship("Nutrient", back_populates="category")
+
+
+class Nutrient(Base):
+    __tablename__ = "nutrient"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    unit: Mapped[str] = mapped_column(String, nullable=False)
+    description: Mapped[str] = mapped_column(String(255), nullable=True)
+    category_id: Mapped[int] = mapped_column(Integer, ForeignKey("nutrient_category.id"), nullable=False)
+
+    category: Mapped["NutrientCategory"] = relationship("NutrientCategory", foreign_keys=[category_id], back_populates="nutrients")
+
+    def __repr__(self):
+        return f"<Nutrient(name={self.name}, unit={self.unit}, description={self.description})>"
+
+
+# e.g., fruits, vegetables, grains, protein foods, and dairy
+class FoodCategory(Base):
+    __tablename__ = "food_category"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    description: Mapped[str] = mapped_column(String(255), nullable=True)
+
+    foods = Mapped[List["Food"]] = relationship("Food", back_populates="category")
+
+    def __repr__(self):
+        return f"<FoodCategory(name={self.name}, description={self.description})>"
+
+
+class FoodMeasure(Base):
+    __tablename__ = "food_measure"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    food_id: Mapped[int] = mapped_column(Integer, ForeignKey("food.id"), nullable=False)
+    gram_weight: float = mapped_column(Float, nullable=False)
+    description: Mapped[str] = mapped_column(String(255), nullable=True) # (e.g., "1 cup", "1 egg", "1 serving", "100 ml")
+
+    food: Mapped["Food"] = relationship("Food", foreign_keys=[food_id], back_populates="food_measures")
+
+    def __repr__(self):
+        return f"<FoodMeasure(name={self.food_id}, weight_in_grams={self.gram_weight}, description={self.description})>"
+
+
 class Food(Base):
     __tablename__ = "food"
 
-    # --- Basic columns ---
-    id: int = Column(Integer, primary_key=True, index=True)
-    name: str = Column(String, unique=True, nullable=False)
-    calories: float = Column(Float, nullable=False)
-    protein: float = Column(Float, nullable=False)
-    fat: float = Column(Float, nullable=False)
-    carbohydrates: float = Column(Float, nullable=False)
+    # --- Basic mapped_columns ---
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    calories_per_100g: float = mapped_column(Float, nullable=False)
+    description: Mapped[str] = mapped_column(String(255), nullable=True)
+    brand: Mapped[str] = mapped_column(String, nullable=True)
+    category_id: Mapped[int] = mapped_column(Integer, ForeignKey("food_category.id"), nullable=False)
+
+    category: Mapped["FoodCategory"] = relationship("FoodCategory", foreign_keys=[category_id], back_populates="foods")
+    nutrients: Mapped[List["Nutrient"]] = relationship("Nutrient", secondary=food_nutrient_association)
+    food_measures: Mapped[List["FoodMeasure"]] = relationship("FoodMeasure", back_populates="food")
 
     def __repr__(self):
-        return f"<Food(name={self.name}, calories={self.calories})>"
+        return f"<Food(name={self.name}, calories_per_100g={self.calories_per_100g}, nutrients=[{', '.join(map(lambda n: n.name,  self.nutrients))}])>"
 
 
 class Meal(Base):
     __tablename__ = "meal"
 
-    # --- Basic columns ---
-    id: int = Column(Integer, primary_key=True, index=True)
-    user_id: int = Column(Integer, ForeignKey("user.id"), nullable=False)
-    name: str = Column(String(100), nullable=False)
-    timestamp: DateTime = Column(
+    # --- Basic mapped_columns ---
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=False)
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
+    timestamp: DateTime = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )  # generate datetime at the DB level
 
