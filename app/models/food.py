@@ -2,9 +2,6 @@ from sqlalchemy import Integer, String, Float, ForeignKey, DateTime, func
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from typing import List
 from app.database import Base  # use the same registry of database.py
-from app.models.nutrient import Nutrient
-from app.models.food_category import FoodCategory
-from app.models.food_measure import FoodMeasure
 from app.models.associations import food_nutrient_association
 
 
@@ -20,7 +17,7 @@ class Food(Base):
     category_id: Mapped[int] = mapped_column(Integer, ForeignKey("food_category.id"), nullable=False)
 
     category: Mapped["FoodCategory"] = relationship("FoodCategory", foreign_keys=[category_id], back_populates="foods")
-    nutrients: Mapped[List["Nutrient"]] = relationship("Nutrient", secondary=food_nutrient_association)
+    nutrients: Mapped[List["Nutrient"]] = relationship("Nutrient", secondary=food_nutrient_association, back_populates="foods")
     food_measures: Mapped[List["FoodMeasure"]] = relationship("FoodMeasure", back_populates="food")
 
     def __repr__(self):

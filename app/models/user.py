@@ -2,8 +2,6 @@ from sqlalchemy import Integer, String, Float, ForeignKey, DateTime, func
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from typing import List
 from app.database import Base  # use the same registry of database.py
-from app.models.meal import Meal
-from app.models.role import Role
 from app.models.associations import user_role_association
 
 

@@ -1,4 +1,5 @@
-from app.models import models
+from app.models.user import User
+from app.models.food import Food
 from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.orm import Session
 from typing import List
@@ -25,7 +26,7 @@ def get_foods(
     elif skip is None:
         skip = 0
 
-    foods = db.query(models.Food).offset(skip).limit(limit).all()
+    foods = db.query(Food).offset(skip).limit(limit).all()
     return foods
 
 
@@ -33,7 +34,7 @@ def get_foods(
 @router.get("/{food_id}", response_model=schemas.FoodResponse)
 def get_food(food_id: int, db: Session = Depends(get_db)):
 
-    food = db.query(models.Food).filter(models.Food.id == food_id).first()
+    food = db.query(Food).filter(Food.id == food_id).first()
     if not food:
         raise NotFoundException()
 
@@ -45,9 +46,9 @@ def get_food(food_id: int, db: Session = Depends(get_db)):
 def create_food(
     food: schemas.FoodCreate,
     db: Session = Depends(get_db),
-    user: models.User = Depends(require_permission(PERMISSIONS.FOOD_CREATE)),
+    user: User = Depends(require_permission(PERMISSIONS.FOOD_CREATE)),
 ):
-    db_food = models.Food(**food.model_dump())
+    db_food = Food(**food.model_dump())
 
     db.add(db_food)
     db.commit()
@@ -62,12 +63,12 @@ def update_food(
     food_id: int,
     updated_food: schemas.FoodUpdate,
     db: Session = Depends(get_db),
-    user: models.User = Depends(require_permission(PERMISSIONS.FOOD_UPDATE)),
+    user: User = Depends(require_permission(PERMISSIONS.FOOD_UPDATE)),
 ):
     db_food = (
-        db.query(models.Food)
-        .order_by(models.Food.id.asc())
-        .filter(models.Food.id == food_id)
+        db.query(Food)
+        .order_by(Food.id.asc())
+        .filter(Food.id == food_id)
         .first()
     )
 
@@ -89,9 +90,9 @@ def partial_update_food(
     food_id: int,
     partial_food: schemas.FoodPartialUpdate,
     db: Session = Depends(get_db),
-    user: models.User = Depends(require_permission(PERMISSIONS.FOOD_UPDATE)),
+    user: User = Depends(require_permission(PERMISSIONS.FOOD_UPDATE)),
 ):
-    db_food = db.query(models.Food).filter(models.Food.id == food_id).first()
+    db_food = db.query(Food).filter(Food.id == food_id).first()
     if not db_food:
         raise NotFoundException()
 
@@ -109,9 +110,9 @@ def partial_update_food(
 def delete_food(
     food_id: int,
     db: Session = Depends(get_db),
-    user: models.User = Depends(require_permission(PERMISSIONS.FOOD_DELETE)),
+    user: User = Depends(require_permission(PERMISSIONS.FOOD_DELETE)),
 ):
-    food = db.query(models.Food).filter(models.Food.id == food_id).first()
+    food = db.query(Food).filter(Food.id == food_id).first()
 
     if not food:
         raise NotFoundException()

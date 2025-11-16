@@ -1,4 +1,5 @@
-from app.models import models
+from app.models.user import User
+from app.models.role import Role
 from fastapi import APIRouter, Depends, status, Query
 from sqlalchemy.orm import Session
 from typing import List
@@ -18,7 +19,7 @@ def get_users(
     skip: int = Query(None, ge=0),
     limit: int = Query(10, le=100),
     db: Session = Depends(get_db),
-    admin_user: models.User = Depends(require_role(BASE_ROLES.ADMIN)),
+    admin_user: User = Depends(require_role(BASE_ROLES.ADMIN)),
 ):
     if page is not None:
         skip = (page - 1) * limit
@@ -26,8 +27,8 @@ def get_users(
         skip = 0
 
     users = (
-        db.query(models.User)
-        .order_by(models.User.id.asc())
+        db.query(User)
+        .order_by(User.id.asc())
         .offset(skip)
         .limit(limit)
         .all()
@@ -41,9 +42,9 @@ def get_users(
 def get_user(
     user_id: int,
     db: Session = Depends(get_db),
-    admin_user: models.User = Depends(require_role(BASE_ROLES.ADMIN)),
+    admin_user: User = Depends(require_role(BASE_ROLES.ADMIN)),
 ):
-    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    db_user = db.query(User).filter(User.id == user_id).first()
     if not db_user:
         raise NotFoundException()
 
@@ -57,26 +58,26 @@ def get_user(
 def create_user(
     user_in: schemas.UserCreate,
     db: Session = Depends(get_db),
-    admin_user: models.User = Depends(require_role(BASE_ROLES.ADMIN)),
+    admin_user: User = Depends(require_role(BASE_ROLES.ADMIN)),
 ):
     # Check duplicates
-    if db.query(models.User).filter(models.User.email == user_in.email).first():
+    if db.query(User).filter(User.email == user_in.email).first():
         raise UserAlreadyExistsException()
 
     # Hash password
     hashed_pw = get_password_hash(user_in.password)
 
-    new_user = models.User(
+    new_user = User(
         username=user_in.username,
         email=user_in.email,
         hashed_password=hashed_pw,
     )
-    print(db.query(models.Role).filter(models.Role.id.in_(user_in.role_ids)).all())
+    print(db.query(Role).filter(Role.id.in_(user_in.role_ids)).all())
     # Assign roles if provided
     if user_in.role_ids:
-        roles = db.query(models.Role).filter(models.Role.id.in_(user_in.role_ids)).all()
+        roles = db.query(Role).filter(Role.id.in_(user_in.role_ids)).all()
     else:
-        default_role = db.query(models.Role).filter_by(name=BASE_ROLES.USER).first()
+        default_role = db.query(Role).filter_by(name=BASE_ROLES.USER).first()
         if not default_role:
             raise Exception("Default USER role not found. Run seed_roles().")
         roles = [default_role]
@@ -96,9 +97,9 @@ def update_user(
     user_id: int,
     user_update: schemas.UserCreate,  # full update: must include password, etc.
     db: Session = Depends(get_db),
-    admin_user: models.User = Depends(require_role(BASE_ROLES.ADMIN)),
+    admin_user: User = Depends(require_role(BASE_ROLES.ADMIN)),
 ):
-    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    db_user = db.query(User).filter(User.id == user_id).first()
     if not db_user:
         raise NotFoundException()
 
@@ -110,7 +111,7 @@ def update_user(
 
     if user_update.role_ids is not None:
         new_roles = (
-            db.query(models.Role).filter(models.Role.id.in_(user_update.role_ids)).all()
+            db.query(Role).filter(Role.id.in_(user_update.role_ids)).all()
         )
         db_user.roles = new_roles
 
@@ -125,9 +126,9 @@ def partial_update_user(
     user_id: int,
     user_update: schemas.UserBase,
     db: Session = Depends(get_db),
-    admin_user: models.User = Depends(require_role(BASE_ROLES.ADMIN)),
+    admin_user: User = Depends(require_role(BASE_ROLES.ADMIN)),
 ):
-    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    db_user = db.query(User).filter(User.id == user_id).first()
     if not db_user:
         raise NotFoundException()
 
@@ -139,7 +140,7 @@ def partial_update_user(
 
     if user_update.role_ids is not None:
         new_roles = (
-            db.query(models.Role).filter(models.Role.id.in_(user_update.role_ids)).all()
+            db.query(Role).filter(Role.id.in_(user_update.role_ids)).all()
         )
         db_user.roles = new_roles
 
@@ -153,9 +154,9 @@ def partial_update_user(
 def delete_user(
     user_id: int,
     db: Session = Depends(get_db),
-    admin_user: models.User = Depends(require_role(BASE_ROLES.ADMIN)),
+    admin_user: User = Depends(require_role(BASE_ROLES.ADMIN)),
 ):
-    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    db_user = db.query(User).filter(User.id == user_id).first()
     if not db_user:
         raise NotFoundException()
 

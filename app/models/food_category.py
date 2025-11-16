@@ -2,7 +2,7 @@ from sqlalchemy import Integer, String
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from typing import List
 from app.database import Base  # use the same registry of database.py
-from app.models.food import Food
+
 
 # e.g., fruits, vegetables, grains, protein foods, and dairy
 class FoodCategory(Base):

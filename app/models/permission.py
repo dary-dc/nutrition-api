@@ -3,7 +3,6 @@ from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 from app.models.associations import role_permission_association
-from app.models.role import Role
 
 class Permission(Base):
     __tablename__ = "permission"

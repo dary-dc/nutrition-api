@@ -1,4 +1,5 @@
-from app.models import models
+from app.models.user import User
+from app.models.meal import Meal
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from typing import List
@@ -17,7 +18,7 @@ def get_meals(
     skip: int = Query(None, ge=0),
     limit: int = Query(10, le=100),  # limit capped at 100 for safety
     db: Session = Depends(get_db),
-    user: models.User = Depends(auth.get_current_user),
+    user: User = Depends(auth.get_current_user),
 ):
     # Prioritize page if both provided
     if page is not None:
@@ -26,11 +27,11 @@ def get_meals(
         skip = 0
 
     meals = (
-        db.query(models.Meal)
-        .order_by(models.Meal.id.asc())
+        db.query(Meal)
+        .order_by(Meal.id.asc())
         .offset(skip)
         .limit(limit)
-        .filter(models.Meal.user_id == user.id)
+        .filter(Meal.user_id == user.id)
         .all()
     )
 
@@ -41,7 +42,7 @@ def get_meals(
 @router.get("/{meal_id}", response_model=schemas.MealResponse)
 def get_meal(meal_id: int, db: Session = Depends(get_db)):
 
-    meal = db.query(models.Meal).filter(models.Meal.id == meal_id).first()
+    meal = db.query(Meal).filter(Meal.id == meal_id).first()
     if not meal:
         raise NotFoundException()
 
@@ -53,7 +54,7 @@ def get_meal(meal_id: int, db: Session = Depends(get_db)):
 def create_meal(
     meal_data: schemas.MealCreate,
     db: Session = Depends(get_db),
-    user: models.User = Depends(auth.get_current_user),
+    user: User = Depends(auth.get_current_user),
 ):
     # Validate that all food IDs exist
     foods = db.query(models.Food).filter(models.Food.id.in_(meal_data.food_ids)).all()
@@ -62,7 +63,7 @@ def create_meal(
         raise NotFoundException(detail="One or more food IDs not found")
 
     # Create the Meal
-    new_meal = models.Meal(name=meal_data.name, user_id=user.id)
+    new_meal = Meal(name=meal_data.name, user_id=user.id)
     new_meal.foods = foods  # ORM auto-fills association table
 
     db.add(new_meal)
@@ -78,9 +79,9 @@ def update_meal(
     meal_id: int,
     updated_meal: schemas.MealUpdate,
     db: Session = Depends(get_db),
-    user: models.User = Depends(auth.get_current_user),
+    user: User = Depends(auth.get_current_user),
 ):
-    db_meal = db.query(models.Meal).filter(models.Meal.id == meal_id).first()
+    db_meal = db.query(Meal).filter(Meal.id == meal_id).first()
 
     if not db_meal:
         raise NotFoundException()
@@ -100,9 +101,9 @@ def partial_update_meal(
     meal_id: int,
     partial_meal: schemas.MealPartialUpdate,
     db: Session = Depends(get_db),
-    user: models.User = Depends(auth.get_current_user),
+    user: User = Depends(auth.get_current_user),
 ):
-    db_meal = db.query(models.Meal).filter(models.Meal.id == meal_id).first()
+    db_meal = db.query(Meal).filter(Meal.id == meal_id).first()
 
     if not db_meal:
         raise NotFoundException()
@@ -120,7 +121,7 @@ def partial_update_meal(
 @router.delete("/{meal_id}")
 def delete_meal(meal_id: int, db: Session = Depends(get_db)):
 
-    meal = db.query(models.Meal).filter(models.Meal.id == meal_id).first()
+    meal = db.query(Meal).filter(Meal.id == meal_id).first()
     if not meal:
         raise NotFoundException()
 

@@ -1,4 +1,4 @@
-from app.models import models
+from app.models.user import User
 from fastapi import APIRouter, Depends, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -21,9 +21,9 @@ def register(
     request: Request,
     new_user: schemas.UserCreate,
     db: Session = Depends(get_db),
-    user: models.User = Depends(security.require_role(BASE_ROLES.ADMIN)),
+    user: User = Depends(security.require_role(BASE_ROLES.ADMIN)),
 ):
-    if db.query(models.User).filter(models.User.email == new_user.email).first():
+    if db.query(User).filter(User.email == new_user.email).first():
         raise UserAlreadyExistsException()
 
     hashed_pw = security.get_password_hash(new_user.password)
@@ -33,7 +33,7 @@ def register(
         # If not seeded yet, raise a controlled error
         raise Exception("Default USER role not found. Run role seeding first.")
 
-    db_user = models.User(
+    db_user = User(
         username=new_user.username,
         email=new_user.email,
         hashed_password=hashed_pw,
@@ -56,7 +56,7 @@ async def login(
     db: Session = Depends(get_db),
 ):
     user = (
-        db.query(models.User).filter(models.User.username == form_data.username).first()
+        db.query(User).filter(User.username == form_data.username).first()
     )
 
     if not user or not security.verify_password(form_data.password, user.hashed_password):
@@ -72,5 +72,5 @@ async def login(
 # FastAPI’s full dependency resolution chain (including nested deps like Session),
 # along with yield cleanup, async handling, and overrides.
 @router.get("/me", response_model=schemas.UserResponse)
-def read_users_me(current_user: models.User = Depends(auth.get_current_user)):
+def read_users_me(current_user: User = Depends(auth.get_current_user)):
     return current_user

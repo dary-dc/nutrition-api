@@ -1,10 +1,8 @@
-from app.database import Base
-from app.models.user import User
-from app.models.permission import Permission
-from app.models.associations import user_role_association, role_permission_association
 from typing import List
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String
+from app.database import Base
+from app.models.associations import user_role_association, role_permission_association
 
 class Role(Base):
     __tablename__ = "role"
